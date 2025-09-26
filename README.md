@@ -10,7 +10,7 @@ A Laravel 12 application that embeds a SOHA-style floating assistant backed by L
 - Laravel MCP server (`/mcp/support-chat`) exposing a read-only database query tool and schema resource to AI clients.
 - Database-aware responses: the assistant auto-limits SQL, enforces safe-table rules, returns result tables, and cites the data it used.
 - Configurable OpenAI settings (model, temperature, limits) via `config/chat-agent.php` and environment variables.
-- Session-backed rate limiting to keep the agent responsive in production.
+- Per-actor rate limiting keyed to the authenticated user or request IP to keep the agent responsive in production.
 
 ## Prerequisites
 - PHP 8.3+
@@ -94,7 +94,7 @@ Returns:
   ]
 }
 ```
-Requests are throttled by the `chat-agent` limiter (30 requests/minute per user/ip).
+Requests are throttled by the `chat-agent` limiter (30 requests/minute per authenticated user ID or, for guests, per IP address).
 
 ### GET `/chat-agent/history`
 ```json

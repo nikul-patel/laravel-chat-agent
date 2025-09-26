@@ -7,8 +7,8 @@ use App\Mcp\Servers\SupportChatServer;
 use App\Mcp\Tools\DatabaseQueryTool;
 use App\Models\ChatMessage;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Http\Request;
+use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -117,7 +117,7 @@ class ChatAgentService
     protected function buildSystemPrompt(array $actor): string
     {
         try {
-            $schemaSnapshot = (string) $this->schemaResource->handle(new McpRequest())->content();
+            $schemaSnapshot = (string) $this->schemaResource->handle(new McpRequest)->content();
         } catch (Throwable $exception) {
             Log::warning('Failed to build schema snapshot for chat agent', ['exception' => $exception]);
             $schemaSnapshot = 'Schema snapshot unavailable: '.$exception->getMessage();
@@ -314,6 +314,7 @@ class ChatAgentService
         $ids = ChatMessage::forActor($actor)
             ->orderByDesc('created_at')
             ->skip($this->historyLimit)
+            ->take(PHP_INT_MAX)
             ->pluck('id');
 
         if ($ids->isNotEmpty()) {
