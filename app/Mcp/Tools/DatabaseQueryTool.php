@@ -121,30 +121,83 @@ class DatabaseQueryTool extends Tool
 
     protected function guardAgainstRestrictedTables(string $statement): ?Response
     {
-        $lower = strtolower($statement);
         $role = $this->actorContext['role'] ?? 'guest';
-
-        $rules = [
-            ' users' => ['admin'],
-            ' user_' => ['admin'],
-            ' customer' => ['admin', 'sales'],
-            ' sales' => ['admin', 'sales'],
-            ' transaction' => ['admin'],
-            ' salary' => ['admin'],
-        ];
-
-        foreach ($rules as $needle => $allowedRoles) {
-            if (str_contains($lower, $needle)) {
-                if (! in_array($role, $allowedRoles, true)) {
-                    return Response::error('You do not have permission to query protected data sets.');
-                }
-            }
-        }
 
         if ($role === 'guest') {
             return Response::error('Please sign in to run database queries.');
         }
 
+        $tables = $this->extractTableIdentifiers($statement);
+
+        $rules = [
+            'users' => ['admin'],
+            'user_*' => ['admin'],
+            'customer*' => ['admin', 'sales'],
+            'sales*' => ['admin', 'sales'],
+            'transaction*' => ['admin'],
+            'salary*' => ['admin'],
+        ];
+
+        foreach ($tables as $table) {
+            foreach ($rules as $pattern => $allowedRoles) {
+                if (Str::is($pattern, $table) && ! in_array($role, $allowedRoles, true)) {
+                    return Response::error('You do not have permission to query protected data sets.');
+                }
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * Extract table identifiers from a SELECT statement.
+     *
+     * @return list<string>
+     */
+    protected function extractTableIdentifiers(string $statement): array
+    {
+        $tables = [];
+
+        if (! preg_match('/\bfrom\b/i', $statement, $match, PREG_OFFSET_CAPTURE)) {
+            return [];
+        }
+
+        $relevant = substr($statement, $match[0][1]);
+
+        preg_match_all('/(?:\bfrom|\bjoin|,)\s*(?:`[^`]+`|"[^"]+"|\[[^\]]+\]|[a-z0-9_.]+)/i', $relevant, $matches);
+
+        foreach ($matches[0] ?? [] as $segment) {
+            $candidate = preg_replace('/^(?:from|join|,)\s*/i', '', $segment);
+            $identifier = $this->normaliseIdentifier($candidate);
+
+            if ($identifier !== null) {
+                $tables[] = $identifier;
+            }
+        }
+
+        return array_values(array_unique($tables));
+    }
+
+    protected function normaliseIdentifier(string $candidate): ?string
+    {
+        $trimmed = trim($candidate);
+
+        if ($trimmed === '' || str_starts_with($trimmed, '(')) {
+            return null;
+        }
+
+        $trimmed = preg_split('/\s+/', $trimmed)[0] ?? '';
+        $trimmed = trim($trimmed, '`"[]');
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (str_contains($trimmed, '.')) {
+            $segments = explode('.', $trimmed);
+            $trimmed = end($segments) ?: $trimmed;
+        }
+
+        return strtolower($trimmed);
     }
 }
