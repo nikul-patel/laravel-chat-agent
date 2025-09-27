@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\ChatAgentService;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -57,6 +58,7 @@ class SohaChatComponentTest extends TestCase
         });
 
         $this->postJson(route('soha-chat.messages'), ['message' => 'Hello'])
+            ->withoutMiddleware(VerifyCsrfToken::class)
             ->assertOk()
             ->assertJson($payload);
     }
