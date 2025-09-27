@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 @import './chat-widget.css';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

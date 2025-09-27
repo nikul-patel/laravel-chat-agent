@@ -87,6 +87,13 @@ class ChatAgentService
         return $this->transformHistory($this->loadPersistedHistory($this->actorContext));
     }
 
+    public function reset(Request $request): void
+    {
+        $this->actorContext = $this->resolveActorContext($request);
+
+        ChatMessage::query()->forActor($this->actorContext)->delete();
+    }
+
     /**
      * Build the conversation array for OpenAI, including system instructions and prior context.
      */

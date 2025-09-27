@@ -1,0 +1,29 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "soha/chat",
+    "description": "Livewire + Flux chat widget for Laravel",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0",
+        "illuminate/routing": "^12.0",
+        "illuminate/validation": "^12.0",
+        "livewire/livewire": "^3.6",
+        "livewire/flux": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Soha\\Chat\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Soha\\Chat\\SohaChatServiceProvider"
+            ]
+        }
+    }
+}
