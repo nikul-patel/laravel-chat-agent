@@ -57,8 +57,9 @@ class SohaChatComponentTest extends TestCase
             $mock->shouldReceive('reset')->zeroOrMoreTimes();
         });
 
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+
         $this->postJson(route('soha-chat.messages'), ['message' => 'Hello'])
-            ->withoutMiddleware(VerifyCsrfToken::class)
             ->assertOk()
             ->assertJson($payload);
     }
