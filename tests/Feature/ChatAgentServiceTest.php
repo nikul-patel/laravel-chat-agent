@@ -103,6 +103,31 @@ class ChatAgentServiceTest extends TestCase
     }
 
     #[Test]
+    public function chat_agent_uses_configured_model_and_temperature(): void
+    {
+        $this->fakeChatResponse('Using configured settings.');
+
+        config()->set('chat-agent.model', 'gpt-unit-test');
+        config()->set('chat-agent.temperature', 0.45);
+
+        Session::start();
+        $sessionStore = Session::driver();
+        $sessionStore->setId(Session::getId());
+        $sessionStore->start();
+
+        $request = Request::create('/chat-agent/message', 'POST');
+        $request->setLaravelSession($sessionStore);
+
+        app(ChatAgentService::class)->reply($request, 'Which model are you using?');
+
+        OpenAI::chat()->assertSent(function (string $method, array $parameters): bool {
+            return $method === 'create'
+                && ($parameters['model'] ?? null) === 'gpt-unit-test'
+                && ($parameters['temperature'] ?? null) === 0.45;
+        });
+    }
+
+    #[Test]
     public function history_endpoint_returns_messages_for_authenticated_user(): void
     {
         $user = User::factory()->create(['role' => 'user']);

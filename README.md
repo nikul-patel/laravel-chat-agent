@@ -3,7 +3,7 @@
 A Laravel 12 application that embeds a SOHA-style floating assistant backed by Laravel Boost, Laravel MCP, and OpenAI. The agent can inspect your MySQL schema, run safe read-only SQL queries, and reply to users in real time inside the app or over HTTP/MCP transports.
 
 ## Features
-- Floating SOHA-inspired chat widget that works out of the box with the main layout.
+- Toggleable SOHA-inspired chat widget (Livewire + Flux) that remembers its open/closed state and works out of the box with the main layout.
 - Automatic persistence of the latest 100 chat messages per signed-in user (or per browser session for guests), reused as context for future replies.
 - Role-aware safeguards that tailor instructions and block access to protected datasets unless the actor has the required permissions.
 - REST endpoints (`POST /chat-agent/message`, `GET /chat-agent/history`) for integrating custom front ends or automated checks.
@@ -59,13 +59,17 @@ php artisan boost:install
 - The HTTP controller (`app/Http/Controllers/Api/ChatController.php`) delegates to `App\Services\ChatAgentService` for orchestration.
 - The service coordinates OpenAI requests, resolves MCP tool calls, persists history, and enforces role-aware constraints.
 - MCP routes live in `routes/ai.php`; REST/chat widget routes live in `routes/web.php`.
-- Front-end assets: `resources/js/chat-widget.js` and `resources/css/chat-widget.css` (imported via `resources/js/app.js` and `resources/css/app.css`).
+- Front-end assets: Livewire view + Alpine controller in `packages/soha/chat/resources/views/livewire/chat-widget.blade.php` with styles delivered via Vite (`resources/css/app.css`).
+- To sync view tweaks from the package into your app, run `php artisan vendor:publish --tag=soha-chat-views --force` (the publish step copies to `resources/views/vendor/soha-chat`).
+- Feature toggles: `config/soha-chat.php` exposes `features.show_reset` and `features.show_theme_toggle` so teams can disable the reset button or theme switcher when embedding the widget elsewhere.
+- Translations: publish the language file with `php artisan vendor:publish --tag=soha-chat-lang --force` if you want to override the built-in end-user messaging.
 
 ## Using the Chat Widget
-- Visit any page rendered with the default layout and click the “Ask SOHA” button in the bottom-right corner.
-- The widget automatically hydrates the latest 100 messages from the server and stores a local cache for snappy reloads.
-- Tool call outputs appear as inline tables or JSON blocks below the assistant’s reply.
+- Visit any page rendered with the default layout and click the “Chat with SOHA” bubble in the bottom-right corner (or press `⌘/Ctrl + K`).
+- The widget remembers whether you left it open or closed (persisted to `localStorage`) so the same state is restored on the next visit.
+- Tool call outputs appear as inline tables or JSON blocks right under the assistant’s reply.
 - Guests receive high-level summaries; signed-in users inherit their `role` (stored on the `users` table) to unlock additional datasets.
+- Use the header controls to cycle themes, reset the conversation, or collapse the widget without losing your history.
 
 ## API Usage
 ### POST `/chat-agent/message`
