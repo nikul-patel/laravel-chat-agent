@@ -1,13 +1,13 @@
 <?php
 
-namespace Database\Factories;
+namespace Soha\Chat\Database\Factories;
 
-use App\Models\ChatMessage;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Soha\Chat\Models\ChatMessage;
 
 /**
- * @extends Factory<\App\Models\ChatMessage>
+ * @extends Factory<\Soha\Chat\Models\ChatMessage>
  */
 class ChatMessageFactory extends Factory
 {
@@ -34,7 +34,7 @@ class ChatMessageFactory extends Factory
         ]);
     }
 
-    public function forUser(User $user): static
+    public function forUser(Model $user): static
     {
         return $this->state(fn () => [
             'user_id' => $user->getKey(),

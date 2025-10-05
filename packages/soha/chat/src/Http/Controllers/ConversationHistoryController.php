@@ -2,9 +2,9 @@
 
 namespace Soha\Chat\Http\Controllers;
 
-use App\Services\ChatAgentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Soha\Chat\Services\ChatAgentService;
 
 class ConversationHistoryController
 {

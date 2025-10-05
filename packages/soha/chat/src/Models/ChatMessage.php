@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace Soha\Chat\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Soha\Chat\Database\Factories\ChatMessageFactory;
 
 class ChatMessage extends Model
 {
@@ -38,5 +39,10 @@ class ChatMessage extends Model
         }
 
         return $query->whereNull('user_id')->where('session_id', $actor['session_id'] ?? null);
+    }
+
+    protected static function newFactory(): ChatMessageFactory
+    {
+        return ChatMessageFactory::new();
     }
 }

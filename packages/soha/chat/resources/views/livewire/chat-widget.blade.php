@@ -1,4 +1,40 @@
-@php($variableStyles = collect($themeVariables ?? [])->map(fn ($value, $variable) => sprintf('%s: %s', $variable, $value))->implode('; '))
+@php
+    $variableStyles = collect($themeVariables ?? [])->map(fn ($value, $variable) => sprintf('%s: %s', $variable, $value))->implode('; ');
+    static $sohaChatAssetsRendered;
+    $sohaChatAssetsRendered ??= false;
+@endphp
+
+@if (! $sohaChatAssetsRendered)
+    @php
+        $sohaChatAssetsRendered = true;
+        $inlineAssets = (bool) config('soha-chat.features.inline_assets', true);
+        $resourceDirectory = realpath(__DIR__.'/../..');
+    @endphp
+
+    @if ($inlineAssets && $resourceDirectory)
+        @foreach (config('soha-chat.assets.css', []) as $stylesheet)
+            @php($stylesheetPath = $resourceDirectory.'/css/'.basename((string) $stylesheet))
+            @if (is_file($stylesheetPath))
+                <style>{!! file_get_contents($stylesheetPath) !!}</style>
+            @endif
+        @endforeach
+
+        @foreach (config('soha-chat.assets.js', []) as $script)
+            @php($scriptPath = $resourceDirectory.'/js/'.basename((string) $script))
+            @if (is_file($scriptPath))
+                <script defer>{!! file_get_contents($scriptPath) !!}</script>
+            @endif
+        @endforeach
+    @else
+        @foreach (config('soha-chat.assets.css', []) as $path)
+            <link rel="stylesheet" href="{{ asset($path) }}">
+        @endforeach
+
+        @foreach (config('soha-chat.assets.js', []) as $path)
+            <script src="{{ asset($path) }}" defer></script>
+        @endforeach
+    @endif
+@endif
 
     <div
         x-data="sohaChatWidget()"

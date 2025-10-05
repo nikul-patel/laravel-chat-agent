@@ -2,12 +2,12 @@
 
 namespace Soha\Chat\Livewire;
 
-use App\Services\ChatAgentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use OpenAI\Exceptions\ErrorException;
+use Soha\Chat\Services\ChatAgentService;
 
 class ChatWidget extends Component
 {

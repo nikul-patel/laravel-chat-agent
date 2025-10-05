@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Services\ChatAgentService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Mockery\MockInterface;
+use Soha\Chat\Services\ChatAgentService;
 use Tests\TestCase;
 
 class SohaChatComponentTest extends TestCase

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\ChatAgentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Soha\Chat\Http\Requests\SendMessageRequest;
+use Soha\Chat\Services\ChatAgentService;
 
 class ChatController extends Controller
 {
@@ -14,13 +15,9 @@ class ChatController extends Controller
         //
     }
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(SendMessageRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'message' => ['required', 'string', 'max:1000'],
-        ]);
-
-        $result = $this->chatAgent->reply($request, $validated['message']);
+        $result = $this->chatAgent->reply($request, (string) $request->validated('message'));
 
         return response()->json($result);
     }
