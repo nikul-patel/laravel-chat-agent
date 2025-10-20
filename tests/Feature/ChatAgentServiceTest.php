@@ -3,10 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\VerifyCsrfToken;
-use App\Mcp\Tools\DatabaseQueryTool;
-use App\Models\ChatMessage;
 use App\Models\User;
-use App\Services\ChatAgentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +14,9 @@ use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Testing\Responses\Fixtures\Chat\CreateResponseFixture;
 use PHPUnit\Framework\Attributes\Test;
+use Soha\Chat\Mcp\Tools\DatabaseQueryTool;
+use Soha\Chat\Models\ChatMessage;
+use Soha\Chat\Services\ChatAgentService;
 use Tests\TestCase;
 
 class ChatAgentServiceTest extends TestCase

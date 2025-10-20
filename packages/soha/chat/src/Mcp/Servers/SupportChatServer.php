@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Mcp\Servers;
+namespace Soha\Chat\Mcp\Servers;
 
-use App\Mcp\Resources\DatabaseSchemaResource;
-use App\Mcp\Tools\DatabaseQueryTool;
 use Illuminate\Support\Str;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Contracts\Transport;
+use Soha\Chat\Mcp\Resources\DatabaseSchemaResource;
+use Soha\Chat\Mcp\Tools\DatabaseQueryTool;
 
 class SupportChatServer extends Server
 {

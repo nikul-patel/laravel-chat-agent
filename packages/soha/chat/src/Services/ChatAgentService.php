@@ -1,11 +1,7 @@
 <?php
 
-namespace App\Services;
+namespace Soha\Chat\Services;
 
-use App\Mcp\Resources\DatabaseSchemaResource;
-use App\Mcp\Servers\SupportChatServer;
-use App\Mcp\Tools\DatabaseQueryTool;
-use App\Models\ChatMessage;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\JsonSchema\JsonSchema;
@@ -20,6 +16,11 @@ use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\Chat\CreateResponseChoice;
 use OpenAI\Responses\Chat\CreateResponseMessage;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
+use Soha\Chat\Mcp\Resources\DatabaseSchemaResource;
+use Soha\Chat\Mcp\Servers\SupportChatServer;
+use Soha\Chat\Mcp\Tools\DatabaseQueryTool;
+use Soha\Chat\Models\ChatMessage;
+use Soha\Chat\Support\ActorContext;
 use Throwable;
 
 class ChatAgentService
@@ -331,19 +332,7 @@ class ChatAgentService
 
     protected function resolveActorContext(Request $request): array
     {
-        $session = $request->session();
-
-        if (! $session->isStarted()) {
-            $session->start();
-        }
-
-        $user = $request->user();
-
-        return [
-            'user_id' => $user?->getKey(),
-            'session_id' => $session->getId(),
-            'role' => $user?->role ?? 'guest',
-        ];
+        return ActorContext::fromRequest($request);
     }
 
     protected function transformHistory(Collection|EloquentCollection $history): array

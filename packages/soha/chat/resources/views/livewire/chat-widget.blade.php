@@ -1,4 +1,45 @@
-@php($variableStyles = collect($themeVariables ?? [])->map(fn ($value, $variable) => sprintf('%s: %s', $variable, $value))->implode('; '))
+@php
+    $variableStyles = collect($themeVariables ?? [])->map(fn ($value, $variable) => sprintf('%s: %s', $variable, $value))->implode('; ');
+    static $sohaChatAssetsRendered;
+    $sohaChatAssetsRendered ??= false;
+@endphp
+
+@if (! $sohaChatAssetsRendered)
+    @php
+        $sohaChatAssetsRendered = true;
+        $inlineAssets = (bool) config('soha-chat.features.inline_assets', true);
+        $assetDirectory = null;
+
+        if ($inlineAssets) {
+            try {
+                $provider = new \ReflectionClass(\Soha\Chat\SohaChatServiceProvider::class);
+                $assetDirectory = realpath(dirname((string) $provider->getFileName()).'/../resources');
+            } catch (\ReflectionException $exception) {
+                $assetDirectory = null;
+            }
+        }
+    @endphp
+
+    @foreach (config('soha-chat.assets.css', []) as $stylesheet)
+        @php($stylesheetPath = $assetDirectory ? $assetDirectory.'/css/'.basename((string) $stylesheet) : null)
+
+        @if ($inlineAssets && $stylesheetPath && is_file($stylesheetPath))
+            <style>{!! file_get_contents($stylesheetPath) !!}</style>
+        @else
+            <link rel="stylesheet" href="{{ asset($stylesheet) }}">
+        @endif
+    @endforeach
+
+    @foreach (config('soha-chat.assets.js', []) as $script)
+        @php($scriptPath = $assetDirectory ? $assetDirectory.'/js/'.basename((string) $script) : null)
+
+        @if ($inlineAssets && $scriptPath && is_file($scriptPath))
+            <script defer>{!! file_get_contents($scriptPath) !!}</script>
+        @else
+            <script src="{{ asset($script) }}" defer></script>
+        @endif
+    @endforeach
+@endif
 
     <div
         x-data="sohaChatWidget()"

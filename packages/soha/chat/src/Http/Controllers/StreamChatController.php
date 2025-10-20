@@ -2,19 +2,15 @@
 
 namespace Soha\Chat\Http\Controllers;
 
-use App\Services\ChatAgentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Soha\Chat\Http\Requests\SendMessageRequest;
+use Soha\Chat\Services\ChatAgentService;
 
 class StreamChatController
 {
-    public function __invoke(Request $request, ChatAgentService $chatAgent): JsonResponse
+    public function __invoke(SendMessageRequest $request, ChatAgentService $chatAgent): JsonResponse
     {
-        $validated = $request->validate([
-            'message' => ['required', 'string', 'max:1000'],
-        ]);
-
-        $result = $chatAgent->reply($request, $validated['message']);
+        $result = $chatAgent->reply($request, (string) $request->validated('message'));
 
         return response()->json($result);
     }

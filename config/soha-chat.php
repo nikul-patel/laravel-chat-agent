@@ -4,6 +4,20 @@ return [
     'middleware' => ['web'],
     'prefix' => 'soha-chat',
 
+    'routes' => [
+        'name' => 'soha-chat.',
+        'api_prefix' => 'soha-chat',
+    ],
+
+    'actors' => [
+        'roles' => [
+            'guest' => 'guest',
+            'authenticated' => 'user',
+        ],
+        'role_attribute' => 'role',
+        'fallback_attribute' => null,
+    ],
+
     'theme' => [
         'preset' => 'system',
         'variables' => [
@@ -33,5 +47,11 @@ return [
     'features' => [
         'show_reset' => false,
         'show_theme_toggle' => false,
+        'inline_assets' => true,
+    ],
+
+    'assets' => [
+        'css' => ['vendor/soha-chat/css/chat-widget.css'],
+        'js' => ['vendor/soha-chat/js/chat-widget.js'],
     ],
 ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Resources;
+namespace Soha\Chat\Mcp\Resources;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +62,7 @@ class DatabaseSchemaResource extends Resource
 
             if ($columns->isEmpty()) {
                 $lines[] = '  (no column metadata available)';
+
                 continue;
             }
 

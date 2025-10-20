@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace Soha\Chat\Mcp\Tools;
 
 use Illuminate\Database\QueryException;
 use Illuminate\JsonSchema\JsonSchema;

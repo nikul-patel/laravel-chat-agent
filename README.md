@@ -13,10 +13,10 @@ A Laravel 12 application that embeds a SOHA-style floating assistant backed by L
 - Per-actor rate limiting keyed to the authenticated user or request IP to keep the agent responsive in production.
 
 ## Prerequisites
-- PHP 8.3+
+- PHP 8.3+ with extensions: `ext-json`, `ext-mbstring`, `pdo_mysql` (production) and `pdo_sqlite` (for local testing/CI)
 - Composer 2.x
 - Node.js 20+ and npm 10+
-- MySQL-compatible database (the schema tools assume MySQL/MariaDB `SHOW` statements)
+- MySQL 8.x (or compatible) database — the schema inspection uses MySQL `SHOW` statements
 - OpenAI API key with access to the Chat Completions API (adjust the model if needed)
 
 ## Getting Started
@@ -56,18 +56,22 @@ php artisan boost:install
 
 ## Configuration Overview
 - `config/chat-agent.php` centralises agent behaviour, schema limits, role naming, and MCP metadata.
-- The HTTP controller (`app/Http/Controllers/Api/ChatController.php`) delegates to `App\Services\ChatAgentService` for orchestration.
+- The HTTP controller (`app/Http/Controllers/Api/ChatController.php`) delegates to `Soha\Chat\Services\ChatAgentService` for orchestration.
 - The service coordinates OpenAI requests, resolves MCP tool calls, persists history, and enforces role-aware constraints.
 - MCP routes live in `routes/ai.php`; REST/chat widget routes live in `routes/web.php`.
-- Front-end assets: Livewire view + Alpine controller in `packages/soha/chat/resources/views/livewire/chat-widget.blade.php` with styles delivered via Vite (`resources/css/app.css`).
-- To sync view tweaks from the package into your app, run `php artisan vendor:publish --tag=soha-chat-views --force` (the publish step copies to `resources/views/vendor/soha-chat`).
-- Feature toggles: `config/soha-chat.php` exposes `features.show_reset` and `features.show_theme_toggle` so teams can disable the reset button or theme switcher when embedding the widget elsewhere.
-- Translations: publish the language file with `php artisan vendor:publish --tag=soha-chat-lang --force` if you want to override the built-in end-user messaging.
+- Front-end assets and scripts ship with the package (`packages/soha/chat/resources/{css,js}`) and are inlined by default; publish them with `php artisan vendor:publish --tag=soha-chat-assets` if you prefer serving from `public/vendor/soha-chat`.
+- To override the default Livewire view, publish it with `php artisan vendor:publish --tag=soha-chat-views --force` (the publish step copies to `resources/views/vendor/soha-chat`).
+- Feature toggles: `config/soha-chat.php` exposes `features.show_reset`, `features.show_theme_toggle`, and `features.inline_assets` plus route and actor customisation knobs.
+- Translations: publish the language file with `php artisan vendor:publish --tag=soha-chat-translations --force` if you want to override the built-in end-user messaging.
 
 ## Using the Chat Widget
 - Visit any page rendered with the default layout and click the “Chat with SOHA” bubble in the bottom-right corner (or press `⌘/Ctrl + K`).
 - The widget remembers whether you left it open or closed (persisted to `localStorage`) so the same state is restored on the next visit.
 - Tool call outputs appear as inline tables or JSON blocks right under the assistant’s reply.
+
+## Automated Releases
+- Push a tag following the `v*` pattern (for example, `v0.1.1`) to trigger the `Release` GitHub Actions workflow.
+- The workflow validates against both SQLite and MySQL, then—on success—creates a GitHub release with generated notes for that tag.
 - Guests receive high-level summaries; signed-in users inherit their `role` (stored on the `users` table) to unlock additional datasets.
 - Use the header controls to cycle themes, reset the conversation, or collapse the widget without losing your history.
 
